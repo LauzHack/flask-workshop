@@ -1,0 +1,121 @@
+<html>
+    <head>
+        <title>The best Todo app!</title>
+        <script>
+            async function seeNotes() {
+                let username = document.getElementById("username-field").value;
+                let response = await fetch("get_notes?" + new URLSearchParams({
+                    username: username,
+                }), {
+                    method: 'POST'
+                });
+                let json = await response.json();
+                let outputText = "";
+                for (let i = 0; i < json.notes.length; i++) {
+                    let item = json.notes[i];
+                    outputText += "<p>" + item.title + ": " + item.content + "</p>";
+                }
+                document.getElementById("all-notes").innerHTML = outputText;
+            }
+
+            async function addNote() {
+                let username = document.getElementById("username-field").value;
+                let title = document.getElementById("note-title-field").value;
+                let content = document.getElementById("note-content-field").value;
+                let response = await fetch("add_note?" + new URLSearchParams({
+                    username: username,
+                    title: title,
+                    content: content
+                }), {
+                    method: 'POST'
+                });
+                let status = response.status;
+                if (status != 201) alert("Failed");
+                else alert("Success");
+            }
+
+            async function uploadPhoto() {
+                let photo = document.getElementById("photo-field").files[0];
+                let formData = new FormData();
+                formData.append("photo", photo);
+                let response = await fetch("upload_photo", {
+                    method: 'POST',
+                    body: formData
+                });
+                let status = response.status;
+                if (status != 200) alert("Failed");
+                else alert("Success");
+            }
+        </script>
+        <style>
+            body {
+                font-family: Arial;
+                background: linear-gradient(to right, #dad299, #b0dab9);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+            #all-notes {
+                border: 1px solid #ccc;
+                width: 35%;
+                min-height: 100px;
+                border-radius: 15px;
+                padding: 10px;
+                background-color: #eeeeee;
+                margin-bottom: 20px;
+            }
+
+            #all-notes p {
+                padding: 20px;
+                margin: 15px;
+                border-radius: 10px;
+                background-color: lightgrey;
+            }
+
+            input[type="text"], textarea {
+                width: 35%;
+                padding: 10px;
+                margin: 15px;
+                border: none;
+                border-radius: 15px;
+                background-color: #eeeeee;
+                font-size: 120%;
+                text-align: center;
+            }
+
+            button {
+                padding-top: 10px;
+                padding-bottom: 10px;
+                padding-left: 20px;
+                padding-right: 20px;
+                margin-bottom: 20px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 110%;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome!</h1>
+        Enter your username: <input type="text" id="username" /> <br />
+        <button onclick="seeNotes()">See notes</button>
+        <h1>All notes</h1>
+        <div id="all-notes"></div>
+        <h1>New note</h1>
+        Enter the note title: <input type="text" id="username" /> <br />
+        Enter the note content: <br />
+        <textarea id="note-content"></textarea> <br />
+        <button onclick="addNote()">Add note</button>
+        <br />
+        <input id="photo-field" type="file" /> <br />
+        <button onclick="uploadPhoto()">Upload photo</button>
+    </body>
+</html>
